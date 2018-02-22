@@ -58,9 +58,9 @@ export class FuseToolbarComponent
                 'flag' : 'us'
             },
             {
-                'id'   : 'tr',
-                'title': 'Turkish',
-                'flag' : 'tr'
+                'id'   : 'kr',
+                'title': 'Korean',
+                'flag' : 'kr'
             }
         ];
 
