@@ -9,6 +9,10 @@ import { DataSource } from '@angular/cdk/collections';
 import { fuseAnimations } from '../../../../core/animations';
 import { Subscription } from 'rxjs/Subscription';
 
+import { HttpClientModule } from '@angular/common/http'; 
+import { HttpModule } from '@angular/http';
+import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
+
 @Component({
     selector     : 'fuse-contacts-contact-list',
     templateUrl  : './contact-list.component.html',
@@ -16,20 +20,17 @@ import { Subscription } from 'rxjs/Subscription';
     encapsulation: ViewEncapsulation.None,
     animations   : fuseAnimations
 })
-export class FuseContactsContactListComponent implements OnInit, OnDestroy
+
+export class FuseContactsContactListComponent implements OnInit
 {
     @ViewChild('dialogContent') dialogContent: TemplateRef<any>;
 
-    contacts: any;
-    user: any;
-    dataSource: FilesDataSource | null;
-    displayedColumns = ['checkbox', 'avatar', 'name', 'email', 'phone', 'jobTitle', 'buttons'];
-    selectedContacts: any[];
-    checkboxes: {};
 
-    onContactsChangedSubscription: Subscription;
-    onSelectedContactsChangedSubscription: Subscription;
-    onUserDataChangedSubscription: Subscription;
+    items: Observable<any[]>;
+
+    // onContactsChangedSubscription: Subscription;
+    // onSelectedContactsChangedSubscription: Subscription;
+    // onUserDataChangedSubscription: Subscription;
 
     dialogRef: any;
 
@@ -37,148 +38,48 @@ export class FuseContactsContactListComponent implements OnInit, OnDestroy
 
     constructor(
         private contactsService: ContactsService,
-        public dialog: MatDialog
+        public dialog: MatDialog,
+        public db: AngularFireDatabase
     )
     {
-        this.onContactsChangedSubscription =
-            this.contactsService.onContactsChanged.subscribe(contacts => {
+        this.items = db.list('patients').valueChanges();
+        // this.dataSource = db.list('patients').valueChanges();
+        // this.dataSource = this.items;
 
-                this.contacts = contacts;
+        // this.onContactsChangedSubscription =
+        //     this.contactsService.onContactsChanged.subscribe(contacts => {
 
-                this.checkboxes = {};
-                contacts.map(contact => {
-                    this.checkboxes[contact.id] = false;
-                });
-            });
+        //         this.contacts = contacts;
 
-        this.onSelectedContactsChangedSubscription =
-            this.contactsService.onSelectedContactsChanged.subscribe(selectedContacts => {
-                for ( const id in this.checkboxes )
-                {
-                    if ( !this.checkboxes.hasOwnProperty(id) )
-                    {
-                        continue;
-                    }
+        //         this.checkboxes = {};
+        //         contacts.map(contact => {
+        //             this.checkboxes[contact.id] = false;
+        //         });
+        //     });
 
-                    this.checkboxes[id] = selectedContacts.includes(id);
-                }
-                this.selectedContacts = selectedContacts;
-            });
+        // this.onSelectedContactsChangedSubscription =
+        //     this.contactsService.onSelectedContactsChanged.subscribe(selectedContacts => {
+        //         for ( const id in this.checkboxes )
+        //         {
+        //             if ( !this.checkboxes.hasOwnProperty(id) )
+        //             {
+        //                 continue;
+        //             }
 
-        this.onUserDataChangedSubscription =
-            this.contactsService.onUserDataChanged.subscribe(user => {
-                this.user = user;
-            });
+        //             this.checkboxes[id] = selectedContacts.includes(id);
+        //         }
+        //         this.selectedContacts = selectedContacts;
+        //     });
+
+        // this.onUserDataChangedSubscription =
+        //     this.contactsService.onUserDataChanged.subscribe(user => {
+        //         this.user = user;
+        //     });
 
     }
 
     ngOnInit()
     {
-        this.dataSource = new FilesDataSource(this.contactsService);
-    }
-
-    ngOnDestroy()
-    {
-        this.onContactsChangedSubscription.unsubscribe();
-        this.onSelectedContactsChangedSubscription.unsubscribe();
-        this.onUserDataChangedSubscription.unsubscribe();
-    }
-
-    editContact(contact)
-    {
-        this.dialogRef = this.dialog.open(FuseContactsContactFormDialogComponent, {
-            panelClass: 'contact-form-dialog',
-            data      : {
-                contact: contact,
-                action : 'edit'
-            }
-        });
-
-        this.dialogRef.afterClosed()
-            .subscribe(response => {
-                if ( !response )
-                {
-                    return;
-                }
-                const actionType: string = response[0];
-                const formData: FormGroup = response[1];
-                switch ( actionType )
-                {
-                    /**
-                     * Save
-                     */
-                    case 'save':
-
-                        this.contactsService.updateContact(formData.getRawValue());
-
-                        break;
-                    /**
-                     * Delete
-                     */
-                    case 'delete':
-
-                        this.deleteContact(contact);
-
-                        break;
-                }
-            });
-    }
-
-    /**
-     * Delete Contact
-     */
-    deleteContact(contact)
-    {
-        this.confirmDialogRef = this.dialog.open(FuseConfirmDialogComponent, {
-            disableClose: false
-        });
-
-        this.confirmDialogRef.componentInstance.confirmMessage = 'Are you sure you want to delete?';
-
-        this.confirmDialogRef.afterClosed().subscribe(result => {
-            if ( result )
-            {
-                this.contactsService.deleteContact(contact);
-            }
-            this.confirmDialogRef = null;
-        });
-
-    }
-
-    onSelectedChange(contactId)
-    {
-        this.contactsService.toggleSelectedContact(contactId);
-    }
-
-    toggleStar(contactId)
-    {
-        if ( this.user.starred.includes(contactId) )
-        {
-            this.user.starred.splice(this.user.starred.indexOf(contactId), 1);
-        }
-        else
-        {
-            this.user.starred.push(contactId);
-        }
-
-        this.contactsService.updateUserData(this.user);
     }
 }
 
-export class FilesDataSource extends DataSource<any>
-{
-    constructor(private contactsService: ContactsService)
-    {
-        super();
-    }
-
-    /** Connect function called by the table to retrieve one stream containing the data to render. */
-    connect(): Observable<any[]>
-    {
-        return this.contactsService.onContactsChanged;
-    }
-
-    disconnect()
-    {
-    }
-}

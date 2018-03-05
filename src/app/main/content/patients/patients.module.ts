@@ -10,6 +10,11 @@ import { FuseContactsMainSidenavComponent } from './sidenavs/main/main.component
 import { FuseContactsContactListComponent } from './contact-list/contact-list.component';
 import { FuseContactsSelectedBarComponent } from './selected-bar/selected-bar.component';
 import { FuseContactsContactFormDialogComponent } from './contact-form/contact-form.component';
+import { AngularFireDatabaseModule } from 'angularfire2/database';
+import { AngularFireModule } from 'angularfire2';
+import { environment } from '../../../../environments/environment';
+
+
 
 const routes = [
     {
@@ -28,7 +33,9 @@ const routes = [
     ],
     imports     : [
         SharedModule,
-        RouterModule.forChild(routes)
+        RouterModule.forChild(routes),
+        AngularFireModule.initializeApp(environment.firebase),
+        AngularFireDatabaseModule
     ],
     exports     : [
         RaphaelsPatientsComponent,

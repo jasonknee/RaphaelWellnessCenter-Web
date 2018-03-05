@@ -43,6 +43,7 @@
     "@types/prismjs": "1.9.0",
     "angular-calendar": "0.23.2",
     "angular-in-memory-web-api": "0.5.2",
+    "angularfire2": "5.0.0-rc.6",
     "classlist.js": "1.1.20150312",
     "core-js": "2.5.3",
     "d3": "4.12.2",

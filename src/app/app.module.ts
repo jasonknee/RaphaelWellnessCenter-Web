@@ -12,6 +12,9 @@ import { FuseConfigService } from './core/services/config.service';
 import { FuseNavigationService } from './core/components/navigation/navigation.service';
 import { RaphaelsPatientsModule } from './main/content/patients/patients.module';
 import { TranslateModule } from '@ngx-translate/core';
+import { AngularFireDatabaseModule } from 'angularfire2/database';
+import { AngularFireModule } from 'angularfire2';
+import { environment } from '../environments/environment';
 
 const appRoutes: Routes = [
     {
@@ -32,7 +35,9 @@ const appRoutes: Routes = [
         SharedModule,
         TranslateModule.forRoot(),
         FuseMainModule,
-        RaphaelsPatientsModule
+        RaphaelsPatientsModule,
+        AngularFireModule.initializeApp(environment.firebase),
+        AngularFireDatabaseModule
     ],
     providers   : [
         FuseSplashScreenService,

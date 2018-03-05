@@ -7,8 +7,11 @@ import { FuseContactsContactFormDialogComponent } from './contact-form/contact-f
 import { MatDialog } from '@angular/material';
 import 'rxjs/add/operator/distinctUntilChanged';
 import { Subscription } from 'rxjs/Subscription';
-// import { Patient } from './patient.model';
+import { Observable } from 'rxjs/Observable';
+import { Patient } from './patient.model';
 import { RaphaelsPatientsService } from './patients.service';
+import { AngularFireDatabase } from 'angularfire2/database';
+
 import { locale as english } from './i18n/en';
 import { locale as korean } from './i18n/kr';
 
@@ -32,6 +35,7 @@ export class RaphaelsPatientsComponent implements OnInit, OnDestroy
         public dialog: MatDialog
     )
     {
+
         raphaelsPatientService.getPatient(1).then(function(data) {
             console.log(data);
         });
