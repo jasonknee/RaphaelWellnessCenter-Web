@@ -25,7 +25,8 @@ export class FuseContactsContactListComponent implements OnInit
 {
     @ViewChild('dialogContent') dialogContent: TemplateRef<any>;
 
-
+    dataSource: PatientsDataSource | null;
+    displayedColumns = ['name', 'type', 'gender', 'phone', 'dob', 'address'];
     items: Observable<any[]>;
 
     // onContactsChangedSubscription: Subscription;
@@ -80,6 +81,26 @@ export class FuseContactsContactListComponent implements OnInit
 
     ngOnInit()
     {
+        this.dataSource = new PatientsDataSource(this.db);
     }
 }
+
+export class PatientsDataSource extends DataSource<any>
+{
+    constructor(public db: AngularFireDatabase)
+    {
+        super();
+    }
+
+    /** Connect function called by the table to retrieve one stream containing the data to render. */
+    connect(): Observable<any[]>
+    {
+        return this.db.list('patients').valueChanges();
+    }
+
+    disconnect()
+    {
+    }
+}
+
 
